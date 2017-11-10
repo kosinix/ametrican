@@ -1,0 +1,27 @@
+{
+
+  "manifest_version": 2,
+  "name": "Ametrican",
+  "version": "0.1.0",
+  "description": "Convert Murican! units into something the rest of the world understands. Convert selected texts containing American units (miles and pounds) into metric.",
+
+  "author": "Nico Amarilla",
+  "homepage_url": "https://github.com/kosinix/ametrican",
+  "developer": {
+    "name": "kosinix",
+    "url": "https://www.kosinix.com"
+  },
+  "icons": {
+    "48": "icons/icon-48.png"
+  },
+
+  "permissions": [
+    "activeTab",
+    "contextMenus"
+  ],
+
+  "background": {
+    "scripts": ["background.js"]
+  }
+
+}
