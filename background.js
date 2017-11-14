@@ -10,3 +10,9 @@ browser.contextMenus.onClicked.addListener(function(info, tab) {
     });
   }
 });
+
+browser.browserAction.onClicked.addListener(function() {
+  browser.tabs.executeScript({
+    file: "convert-all.js"
+  });
+});
