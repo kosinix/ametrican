@@ -4,25 +4,67 @@
         <meta charset="utf-8">
     </head>
     <body>
-        <h1>Sample texts that the add-on can convert.</h1>
-        <h2>Title <span>with murican units: 1.5 miles</span></h2>
-        <p>A string with multiple miles in it: <br> 100 miles is longer than 1 mile.</p>
+        <h1>Test Suite</h1>
+        <p>Click the icon in and see if the test string matches the expected column.</p>
+        <table width="100%">
+            <thead>
+                <tr>
+                    <th>Expected</th>
+                    <th>Test</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1.61 kilometers</td>
+                    <td>1 mile</td>
+                </tr>
+                <tr>
+                    <td>3.22 kilometers</td>
+                    <td>2 miles</td>
+                </tr>
+                <tr>
+                    <td>1 kilometer</td>
+                    <td>0.62 mile</td>
+                </tr>
+                <tr>
+                    <td><p>A string with multiple miles in it: <br> 160.93 kilometers is longer than 1.61 kilometers.</p></td>
+                    <td><p>A string with multiple miles in it: <br> 100 miles is longer than 1 mile.</p></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        
+        <h2>These strings should be ignored:</h2>
         <ul>
-            <li>1 mile</li>
-            <li>0.621 mile</li>
-            <li>2 miles</li>
-            <li>1 mi</li>
-            <li>1 mi.</li>
-            <li>1mile</li>
-            <li>2miles</li>
-            <li>1mi</li>
-            <li>1mi.</li>
-            <li>Two (2) miles. 100 mile is not that far.</li>
+            <li>A "mil" should be ignored as in 10 million</li>
+            <li>There are 2 milestones</li>
         </ul>
-
+      
+        <table width="100%">
+            <thead>
+                <tr>
+                    <th>Expected</th>
+                    <th>Test</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0.45 kilogram</td>
+                    <td>1 pound</td>
+                </tr>
+                <tr>
+                    <td>0.23 kilogram</td>
+                    <td>0.5 pound</td>
+                </tr>
+                <tr>
+                    <td>0.45 kilogram</td>
+                    <td>1 lb</td>
+                </tr>
+                
+            </tbody>
+        </table>
         <ul>
-            <li>1 pound</li>
-            <li>0.5 pound</li>
+            
             <li>2 pounds</li>
             <li>1 lb</li>
             <li>1 lb.</li>
