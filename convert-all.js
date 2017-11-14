@@ -58,7 +58,7 @@ if(!style.match(/ametrican-highlight/g)){ // If we have added the style, we have
                 newNumero = newNumero.toFixed(2).replace(/\.00$/, '');
 
             }
-            var newValue = value.replace(suspect, '<span class="__ametrican-highlight">'+newNumero+' '+newUnits+'</span>');
+            var newValue = value.replace(suspect, '<span class="__ametrican-highlight" title="'+suspect+'">'+newNumero+' '+newUnits+'</span>');
         }
     
         // Do nothing if blank
