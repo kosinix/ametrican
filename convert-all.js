@@ -14,7 +14,6 @@ if(!style.match(/ametrican-highlight/g)){ // If we have added the style, we have
 
     // Do conversion on each text node
     elements.forEach(function(el) {
-      console.log(el)
       if (el.parentNode) {
         el.parentNode.innerHTML = convertToMetric(el.nodeValue,
           ((new_, old) => '<span class="__ametrican-highlight" title="' + old + '">' + new_ + '</span>'))

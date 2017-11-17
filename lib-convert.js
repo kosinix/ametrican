@@ -1,8 +1,30 @@
 let conversions = [
+  // length
+  {
+    regex: /inch(es)?|in\.?/,
+    target: "cm",
+    conversion: x => x * 2.54
+  },
+  {
+    regex: /foot|feet|ft\.?/,
+    target: "m",
+    conversion: x => x * 0.3048
+  },
+  {
+    regex: /yards?|yd\.?/,
+    target: "m",
+    conversion: x => x * 0.9144
+  },
   {
     regex: /miles?|mi\.?/,
     target: "km",
     conversion: x => x * 1.6093
+  },
+  // mass
+  {
+    regex: /ounces?|oz/,
+    target: "g",
+    conversion: x => x * 28.35
   },
   {
     regex: /pounds?|lb[s\.]?/,
@@ -20,6 +42,10 @@ let re_all = new RegExp("\\b(" + re_number.source + ")\\s?("
                             + ")\\b",
                           "gi")
 
+/**
+* Replaces all occurences of imperial units in a string with appropriate metric
+* units. Optional callback is applied to each replaced sub-string.
+*/
 function convertToMetric(text, callback) {
   callback = callback || (x => x)
   return text.replace(re_all, (oldValue, value, _, unit) => {
