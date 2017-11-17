@@ -57,13 +57,20 @@ if(!style.match(/ametrican-highlight/g)){ // If we have added the style, we have
                 // Format with max decimal places of 2. Remove if its .00
                 newNumero = newNumero.toFixed(2).replace(/\.00$/, '');
 
+                newValue = value.replace(suspect, '<span class="__ametrican-highlight" title="'+suspect+'">'+newNumero+' '+newUnits+'</span>');
+                
+                console.log('suspect',suspect)
+                console.log('newValue',newValue);
+ 
             }
-            var newValue = value.replace(suspect, '<span class="__ametrican-highlight" title="'+suspect+'">'+newNumero+' '+newUnits+'</span>');
+            // console.log(suspect)
+            
         }
     
         // Do nothing if blank
         if(newValue !=''){
-            el.parentNode.innerHTML = newValue;
+            el.parentNode.innerHTML = el.parentNode.innerHTML.replace(/miles/, 'xx');// = newValue;
+            console.log(el);
         }
     })
 }
