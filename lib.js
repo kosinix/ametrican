@@ -78,11 +78,18 @@ function convertChildren(parentNode){
   elements.forEach((el) => {
       if (el.parentNode && !el.childNodes.length) {
           let newHTML = convertToMetric(el.nodeValue,
-              ((new_, old) => '<span class="__ametrican-highlight" title="' + old + '">' + new_ + '</span>'))
+              ((new_, old) => '<span class="__ametrican-highlight" title="' + strip(old) + '">' + strip(new_) + '</span>'))
           // Only update if changed
           if (newHTML !== el.nodeValue) {
               el.parentNode.innerHTML = el.parentNode.innerHTML.replace(el.nodeValue, newHTML)
           }
       }
   });
+}
+
+// Add some sanitation
+function strip(html) {
+  var tmp = document.createElement("DIV");
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText;
 }
