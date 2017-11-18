@@ -57,3 +57,33 @@ function convertToMetric(text, callback) {
     return callback(newValue, oldValue)
   })
 }
+
+// Finds all text nodes
+function textNodesUnder(el){
+  var n, a=[], walk=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null,false);
+  while(n=walk.nextNode()) a.push(n);
+  return a;
+}
+
+// Walk thru child nodes and convert their values
+function convertChildren(parentNode){
+  // Find all text nodes
+  let elements = textNodesUnder(parentNode);
+
+  // Remove blanks
+  elements = elements.filter((el)=>{
+      return el.nodeValue.trim() !== '';
+  });
+  console.log('elements',elements)
+  // Do conversion on each text node
+  elements.forEach((el) => {
+      if (el.parentNode && !el.childNodes.length) {
+          let newHTML = convertToMetric(el.nodeValue,
+              ((new_, old) => '<span class="__ametrican-highlight" title="' + old + '">' + new_ + '</span>'))
+          // Only update if changed
+          if (newHTML !== el.nodeValue) {
+              el.parentNode.innerHTML = el.parentNode.innerHTML.replace(el.nodeValue, newHTML)
+          }
+      }
+  });
+}
