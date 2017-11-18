@@ -9,10 +9,10 @@ browser.contextMenus.onClicked.addListener(function(info, tab) {
   if (info.menuItemId == "to-metric") {
     browser.tabs.insertCSS({code: CSS});
     browser.tabs.executeScript({
-      file: "lib-convert.js"
+      file: "lib.js"
     });
     browser.tabs.executeScript({
-      file: "convert.js"
+      file: "convert-selected.js"
     });
   }
 });
@@ -20,7 +20,7 @@ browser.contextMenus.onClicked.addListener(function(info, tab) {
 browser.browserAction.onClicked.addListener(async function() {
   browser.tabs.insertCSS({code: CSS});
   browser.tabs.executeScript({
-    file: "lib-convert.js"
+    file: "lib.js"
   });
   browser.tabs.executeScript({
     file: "convert-all.js"
