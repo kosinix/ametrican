@@ -1,4 +1,4 @@
-let conversions = [
+var conversions = [
   // length
   {
     regex: /inch(es)?|in\.?/,
@@ -34,10 +34,10 @@ let conversions = [
 ]
 
 // Should match any number (does it?)
-let re_number = /\d+(\.\d+)?/
+var re_number = /\d+(\.\d+)?/
 
 // "One RegExp to rule them all, One RegExp to find them ..."
-let re_all = new RegExp("\\b(" + re_number.source + ")\\s?("
+var re_all = new RegExp("\\b(" + re_number.source + ")\\s?("
                             + conversions.map(x => x.regex.source).join("|")
                             + ")\\b",
                           "gi")
