@@ -6,6 +6,8 @@
     <body>
         <h1>Test Suite</h1>
         <p>Click the icon in and see if the test string matches the expected column.</p>
+
+        <h2>Miles to Kilometers</h2>
         <table width="100%">
             <thead>
                 <tr>
@@ -15,31 +17,32 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>1.61 kilometers</td>
+                    <td>1.61 km</td>
                     <td>1 mile</td>
                 </tr>
                 <tr>
-                    <td>3.22 kilometers</td>
+                    <td>3.22 km</td>
                     <td>2 miles</td>
                 </tr>
                 <tr>
-                    <td>1 kilometer</td>
+                    <td>1 km</td>
                     <td>0.62 mile</td>
                 </tr>
                 <tr>
-                    <td><p>A string with multiple miles in it: <br> 160.93 kilometers is longer than 1.61 kilometers.</p></td>
+                    <td><p>A string with multiple miles in it: <br> 160.93 km is longer than 1.61 km.</p></td>
                     <td><p>A string with multiple miles in it: <br> 100 miles is longer than 1 mile.</p></td>
                 </tr>
             </tbody>
         </table>
         
         
-        <h2>These strings should be ignored:</h2>
+        <h3>These strings should be ignored:</h3>
         <ul>
             <li>A "mil" should be ignored as in 10 million</li>
             <li>There are 2 milestones</li>
         </ul>
       
+        <h2>Pounds to Kilos</h2>
         <table width="100%">
             <thead>
                 <tr>
@@ -49,34 +52,26 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>0.45 kilogram</td>
+                    <td>0.45 kg</td>
                     <td>1 pound</td>
                 </tr>
                 <tr>
-                    <td>0.23 kilogram</td>
+                    <td>0.23 kg</td>
                     <td>0.5 pound</td>
                 </tr>
                 <tr>
-                    <td>0.45 kilogram</td>
+                    <td>0.45 kg</td>
                     <td>1 lb</td>
+                </tr>
+                <tr>
+                    <td>No space between num and unit: 1 kg</td>
+                    <td>No space between num and unit: 2.2lbs. </td>
                 </tr>
                 
             </tbody>
         </table>
-        <ul>
-            
-            <li>2 pounds</li>
-            <li>1 lb</li>
-            <li>1 lb.</li>
-            <li>2.2 lbs</li>
-            <li>2.2 lbs.</li>
-            <li>1pound</li>
-            <li>2.2pounds</li>
-            <li>1lb</li>
-            <li>1lb.</li>
-            <li>2.2lbs</li>
-            <li>2.2lbs.</li>
-        </ul>
+        
+        <h2>Inch to Centimeter</h2>
 
         <table width="100%">
             <thead>
@@ -101,5 +96,7 @@
                 
             </tbody>
         </table>
+        <h3>These strings should be ignored:</h3>
+        <p>2 inchworms are crawling.</p>
     </body>
 </html>
