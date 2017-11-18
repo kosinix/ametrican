@@ -74,7 +74,6 @@ function convertChildren(parentNode){
   elements = elements.filter((el)=>{
       return el.nodeValue.trim() !== '';
   });
-  console.log('elements',elements)
   // Do conversion on each text node
   elements.forEach((el) => {
       if (el.parentNode && !el.childNodes.length) {
