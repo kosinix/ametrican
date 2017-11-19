@@ -1,43 +1,58 @@
 var conversions = [
-  // length
+  // Length
   {
     regex: /inch(es)?|in\.?/,
-    target: "cm",
+    target: " cm",
     conversion: x => x * 2.54
   },
   {
     regex: /foot|feet|ft\.?/,
-    target: "m",
+    target: " m",
     conversion: x => x * 0.3048
   },
   {
     regex: /yards?|yd\.?/,
-    target: "m",
+    target: " m",
     conversion: x => x * 0.9144
   },
   {
     regex: /miles?|mi\.?/,
-    target: "km",
+    target: " km",
     conversion: x => x * 1.6093
   },
-  // mass
+  // Mass
   {
     regex: /ounces?|oz/,
-    target: "g",
+    target: " g",
     conversion: x => x * 28.35
   },
   {
     regex: /pounds?|lb[s\.]?/,
-    target: "kg",
+    target: " kg",
     conversion: x => x * 0.4536
   },
+  // Temperature
+  // Fahrenheit needs to be earlier in the list than F so that arr.find()
+  // first tries to match the full Fahrenheit
+  {
+    regex: /°\s?Fahrenheit/,
+    target: "° Celsius",
+    conversion: x => (x - 32) * 5 / 9
+  },
+  {
+    regex: /°\s?F/,
+    target: "° C",
+    conversion: x => (x - 32) * 5 / 9
+  }
 ]
 
 // Should match any number (does it?)
-var re_number = /\d+(\.\d+)?/
+// Negatives are relative for Fahrenheit conversion
+// These are different characters: - (char code 45) and − (char code 8722)
+var re_number = /[−\-]?\d+(\.\d+)?/
 
 // "One RegExp to rule them all, One RegExp to find them ..."
-var re_all = new RegExp("\\b(" + re_number.source + ")\\s?("
+var re_all = new RegExp("(" + re_number.source + ")\\s?("
                             + conversions.map(x => x.regex.source).join("|")
                             + ")\\b",
                           "gi")
@@ -48,13 +63,15 @@ var re_all = new RegExp("\\b(" + re_number.source + ")\\s?("
 */
 function convertToMetric(text, callback) {
   callback = callback || (x => x)
-  return text.replace(re_all, (oldValue, value, _, unit) => {
+  return text.replace(re_all, (oldText, value, _, unit) => {
     let conv = conversions.find(c => unit.match(c.regex))
+    // some people might use char code 8722 instead of 45...
+    value = value.replace("−", "-")
     let converted = conv.conversion(value)
     // Format with max decimal places of 2. Remove if its .00
     let fixed = converted.toFixed(2).replace(/\.00$/, '')
-    let newValue =  fixed + " " + conv.target
-    return callback(newValue, oldValue)
+    let newText =  fixed + conv.target
+    return callback(newText, oldText)
   })
 }
 

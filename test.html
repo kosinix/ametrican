@@ -29,19 +29,23 @@
                     <td>0.62 mile</td>
                 </tr>
                 <tr>
+                    <td>-32.19 km</td>
+                    <td>-20mi</td>
+                </tr>
+                <tr>
                     <td><p>A string with multiple miles in it: <br> 160.93 km is longer than 1.61 km.</p></td>
                     <td><p>A string with multiple miles in it: <br> 100 miles is longer than 1 mile.</p></td>
                 </tr>
             </tbody>
         </table>
-        
-        
+
+
         <h3>These strings should be ignored:</h3>
         <ul>
             <li>A "mil" should be ignored as in 10 million</li>
             <li>There are 2 milestones</li>
         </ul>
-      
+
         <h2>Pounds to Kilos</h2>
         <table width="100%">
             <thead>
@@ -67,12 +71,11 @@
                     <td>No space between num and unit: 1 kg</td>
                     <td>No space between num and unit: 2.2lbs. </td>
                 </tr>
-                
+
             </tbody>
         </table>
-        
-        <h2>Inch to Centimeter</h2>
 
+        <h2>Inch to Centimeter</h2>
         <table width="100%">
             <thead>
                 <tr>
@@ -93,10 +96,38 @@
                     <td>30.48 cm</td>
                     <td>12 inches</td>
                 </tr>
-                
+
             </tbody>
         </table>
         <h3>These strings should be ignored:</h3>
         <p>2 inchworms are crawling.</p>
+
+        <h2>Fahrenheit to Celsius</h2>
+        <table width="100%">
+            <thead>
+                <tr>
+                    <th>Expected</th>
+                    <th>Test</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                  <td>Water boils at 100° Celsius.</td>
+                  <td>Water boils at 212° Fahrenheit.</td>
+                </tr>
+                <tr>
+                  <td>Body temp: 37° C</td>
+                  <td>Body temp: 98.6° F</td>
+                </tr>
+                <tr>
+                  <td>0° C</td>
+                  <td>32°F</td>
+                </tr>
+                <tr>
+                  <td>All -40° C ?</td>
+                  <td>−40° F, -40°F</td>
+                </tr>
+            </tbody>
+        </table>
     </body>
 </html>
