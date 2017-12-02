@@ -110,3 +110,8 @@ function strip(html) {
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText;
 }
+
+// export functions for use in node.js
+module.exports = {
+  convertToMetric: convertToMetric,
+}
