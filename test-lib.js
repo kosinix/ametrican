@@ -28,6 +28,10 @@ let tests = {
   "−40° F": "-40° C", // − instead of -
   "-40°F": "-40° C",
   "10° Fusel": null,
+  // miles per hour
+  "100 mph": "160.93 kph",
+  "Don't drive faster than 80mi/h!": "Don't drive faster than 128.75 km/h!",
+  "20 miles per hour": "32.19 km per hour",
 }
 
 let count = 0

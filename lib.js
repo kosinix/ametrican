@@ -18,7 +18,13 @@ var conversions = [
   {
     regex: /miles?|mi\.?/,
     target: " km",
-    conversion: x => x * 1.6093
+    conversion: x => x * 1.609344
+  },
+  // speed
+  {
+    regex: /mph/,
+    target: " kph",
+    conversion: x => x * 1.609344
   },
   // Mass
   {
