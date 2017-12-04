@@ -1,67 +1,43 @@
-var conversions = [
+if (!conversions) {
+  var conversions = []
+
+  let addConv = function(regex, target, fun) {
+    conversions.push({
+      regex: regex,
+      target: target,
+      conversion: fun,
+    })
+  }
+
+  let mile_to_m = x => x * 1.609344
+  let f_to_c = x => (x - 32) * 5 / 9
+
   // Length
-  {
-    regex: /inch(es)?|in\.?/,
-    target: " cm",
-    conversion: x => x * 2.54
-  },
-  {
-    regex: /foot|feet|ft\.?/,
-    target: " m",
-    conversion: x => x * 0.3048
-  },
-  {
-    regex: /yards?|yd\.?/,
-    target: " m",
-    conversion: x => x * 0.9144
-  },
-  {
-    regex: /miles?|mi\.?/,
-    target: " km",
-    conversion: x => x * 1.609344
-  },
-  // speed
-  {
-    regex: /mph/,
-    target: " kph",
-    conversion: x => x * 1.609344
-  },
+  addConv(/inch(es)?|in\.?/, " cm", x => x * 2.54)
+  addConv(/foot|feet|ft\.?/, " m", x => x * 0.3048)
+  addConv(/yards?|yd\.?/, " m", x => x * 0.9144)
+  addConv(/miles?|mi\.?/, " km", mile_to_m)
+  // Speed
+  addConv(/mph/, " kph", mile_to_m)
   // Mass
-  {
-    regex: /ounces?|oz/,
-    target: " g",
-    conversion: x => x * 28.35
-  },
-  {
-    regex: /pounds?|lb[s\.]?/,
-    target: " kg",
-    conversion: x => x * 0.4536
-  },
+  addConv(/ounces?|oz/, " g", x => x * 28.35)
+  addConv(/pounds?|lb[s\.]?/, " kg", x => x * 0.4536)
   // Temperature
   // Fahrenheit needs to be earlier in the list than F so that arr.find()
   // first tries to match the full Fahrenheit
-  {
-    regex: /°\s?Fahrenheit/,
-    target: "° Celsius",
-    conversion: x => (x - 32) * 5 / 9
-  },
-  {
-    regex: /°\s?F/,
-    target: "° C",
-    conversion: x => (x - 32) * 5 / 9
-  }
-]
+  addConv(/°\s?Fahrenheit/, "° Celsius", f_to_c)
+  addConv(/°\s?F/, "° C", f_to_c)
 
-// Should match any number (does it?)
-// Negatives are relative for Fahrenheit conversion
-// These are different characters: - (char code 45) and − (char code 8722)
-var re_number = /[−\-]?\d+(\.\d+)?/
+  // Should match any number (does it?)
+  // Negatives are relative for Fahrenheit conversion
+  // These are different characters: - (char code 45) and − (char code 8722)
+  let re_number = /[−\-]?\d+(\.\d+)?/
 
-// "One RegExp to rule them all, One RegExp to find them ..."
-var re_all = new RegExp("(" + re_number.source + ")\\s?("
-                            + conversions.map(x => x.regex.source).join("|")
-                            + ")\\b",
-                          "gi")
+  // "One RegExp to rule them all, One RegExp to find them ..."
+  var re_all = new RegExp("(" + re_number.source + ")\\s?("
+                              + conversions.map(x => x.regex.source).join("|")
+                              + ")\\b", "gi")
+}
 
 /**
 * Replaces all occurences of imperial units in a string with appropriate metric
