@@ -1,8 +1,15 @@
 #!/bin/node
 
+// Simple script to test lib.convertToMetric()
+// Run without arguments for normal tests:
+// `node test-lib.js`
+// To test the performance run:
+// `node test-lib.js --perf <optinal-count>`
+
 const lib = require("./lib.js")
 
-// test-string: expected-result or null if we expect no changes
+// Layout: `test-string`: `expected-result`
+// `expected-result` may be `null` if we don't expect changes.
 let tests = {
   // mile -> km
   "1 mile": "1.61 km",
@@ -34,18 +41,53 @@ let tests = {
   "20 miles per hour": "32.19 km per hour",
 }
 
-let count = 0
-let errors = 0
-for (key in tests) {
-  count++
-  let result = lib.convertToMetric(key)
-  let expected = tests[key] || key
-  if (result != expected) {
-    console.log("Test #" + count + " failed\n" +
-        "\tInput:    \"" + key + "\"\n" +
-        "\tExpected: \"" + expected + "\"\n" +
-        "\tOutput:   \"" + result + "\"")
-    errors++
+function runTests(silent) {
+  let count = 0
+  let errors = 0
+  for (key in tests) {
+    count++
+    let result = lib.convertToMetric(key)
+    let expected = tests[key] || key
+    if (result != expected) {
+      errors++
+      if (!silent) {
+        console.log("Test #" + count + " failed\n" +
+            "\tInput:    \"" + key + "\"\n" +
+            "\tExpected: \"" + expected + "\"\n" +
+            "\tOutput:   \"" + result + "\"")
+      }
+    }
+  }
+  if (!silent) {
+    console.log("Ran " + count + " tests; " + errors + " errors.")
   }
 }
-console.log("Ran " + count + " tests; " + errors + " errors.")
+
+// Run the normal tests <count> times
+function runPerfTest(count) {
+  count = count || 10000 // arbitrary number
+  console.log("Running tests " + count + " times. Stay put.")
+  let average_time = null
+  for (let i = 0; i < count; i++) {
+    // Only print the first results, the rests should be the same
+    let start = process.hrtime()
+    runTests(true)
+    let time_nano = process.hrtime(start)[1] // let's just ignore seconds here
+    if (average_time) {
+      average_time = (average_time + time_nano) / 2
+    } else {
+      average_time = time_nano
+    }
+  }
+  console.log("Average time: " + average_time.toFixed() + "ns")
+}
+
+
+console.time("Total time")
+runTests()
+// Optionaly run performance test.
+const args = process.argv
+if (args[2] == "--perf") {
+  runPerfTest(args[3])
+}
+console.timeEnd("Total time")
