@@ -37,6 +37,16 @@ var conversions = [
     target: " kg",
     conversion: x => x * 0.4536
   },
+  {
+    regex: /short tons?|[uU][sS] tons?/,
+    target: " metric ton",
+    conversion: x => x * 0.907185
+  },
+  {
+    regex: /long tons?|imperial tons?/,
+    target: " metric ton",
+    conversion: x => x * 1.01605
+  },
   // Temperature
   // Fahrenheit needs to be earlier in the list than F so that arr.find()
   // first tries to match the full Fahrenheit
