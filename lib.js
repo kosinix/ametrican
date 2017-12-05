@@ -22,6 +22,8 @@ if (!conversions) {
   // Mass
   addConv(/ounces?|oz/, " g", x => x * 28.35)
   addConv(/pounds?|lb[s\.]?/, " kg", x => x * 0.4536)
+  addConv(/short tons?|[uU][sS] tons?/, " metric ton", x => x * 0.907185)
+  addConv(/long tons?|imperial tons?/, " metric ton", x => x * 1.01605)
   // Temperature
   // Fahrenheit needs to be earlier in the list than F so that arr.find()
   // first tries to match the full Fahrenheit
