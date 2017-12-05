@@ -1,34 +1,42 @@
 if (!conversions) {
   var conversions = []
-
-  let addConv = function(regex, target, fun) {
+  // Arguments: regex, target, [plural,] function
+  let addConv = function(regex, target, arg3, arg4) {
     conversions.push({
       regex: regex,
       target: target,
-      conversion: fun,
+      plural: arg4 ? arg3 : target,
+      conversion: arg4 ? arg4 : arg3,
     })
   }
-
-  let mile_to_m = x => x * 1.609344
-  let f_to_c = x => (x - 32) * 5 / 9
-
   // Length
-  addConv(/inch(es)?|in\.?/, " cm", x => x * 2.54)
-  addConv(/foot|feet|ft\.?/, " m", x => x * 0.3048)
-  addConv(/yards?|yd\.?/, " m", x => x * 0.9144)
-  addConv(/miles?|mi\.?/, " km", mile_to_m)
+  let in_to_cm = x => x * 2.54
+  addConv(/in\.?/, "cm", in_to_cm)
+  addConv(/inch(es)?/, "centimeter", "centimeters", in_to_cm)
+  let ft_to_m = x => x * 0.3048
+  addConv(/foot|(feet)/, "meter", "meters", ft_to_m)
+  addConv(/ft\.?/, "m", ft_to_m)
+  let yd_to_m = x => x * 0.9144
+  addConv(/yard(s)?/, "meter", "meters", yd_to_m)
+  addConv(/yd\.?/, "m", yd_to_m)
+  let mile_to_m = x => x * 1.609344
+  addConv(/mi\.?/, "km", mile_to_m)
+  addConv(/miles?/, "kilometer", "kilometers", mile_to_m)
   // Speed
-  addConv(/mph/, " kph", mile_to_m)
+  addConv(/mph/, "km/h", mile_to_m)
   // Mass
-  addConv(/ounces?|oz/, " g", x => x * 28.35)
-  addConv(/pounds?|lb[s\.]?/, " kg", x => x * 0.4536)
-  addConv(/short tons?|[uU][sS] tons?/, " metric ton", x => x * 0.907185)
-  addConv(/long tons?|imperial tons?/, " metric ton", x => x * 1.01605)
+  let oz_to_g = x => x * 28.35
+  addConv(/oz/, "g", oz_to_g)
+  addConv(/ounces?/, "gram", "grams", oz_to_g)
+  let lb_to_kg = x => x * 0.4536
+  addConv(/lb[s\.]?/, "kg", lb_to_kg)
+  addConv(/pounds?/, "kilogram", "kilograms", lb_to_kg)
+  addConv(/short tons?|us tons?/, "metric ton", "metric tons", x => x * 0.907185)
+  addConv(/long tons?|imperial tons?/, "metric ton", "metric tons", x => x * 1.01605)
   // Temperature
-  // Fahrenheit needs to be earlier in the list than F so that arr.find()
-  // first tries to match the full Fahrenheit
-  addConv(/°\s?Fahrenheit/, "° Celsius", f_to_c)
+  let f_to_c = x => (x - 32) * 5 / 9
   addConv(/°\s?F/, "° C", f_to_c)
+  addConv(/°\s?Fahrenheit/, "° Celsius", f_to_c)
 
   // Should match any number (does it?)
   // Negatives are relative for Fahrenheit conversion
@@ -36,9 +44,15 @@ if (!conversions) {
   let re_number = /[−\-]?\d+(\.\d+)?/
 
   // "One RegExp to rule them all, One RegExp to find them ..."
-  var re_all = new RegExp("(" + re_number.source + ")\\s?("
+  var re_all = new RegExp("(" + re_number.source + ")(\\s?)("
                               + conversions.map(x => x.regex.source).join("|")
                               + ")\\b", "gi")
+
+  // Ensure the regular expression match the complete unit and are case insensitive
+  conversions = conversions.map(c => {
+    c.regex = new RegExp(c.regex.source + "$", "i")
+    return c
+  })
 }
 
 /**
@@ -47,14 +61,20 @@ if (!conversions) {
 */
 function convertToMetric(text, callback) {
   callback = callback || (x => x)
-  return text.replace(re_all, (oldText, value, _, unit) => {
+  return text.replace(re_all, (oldText, value, _, delimiter, unit) => {
     let conv = conversions.find(c => unit.match(c.regex))
     // some people might use char code 8722 instead of 45...
     value = value.replace("−", "-")
     let converted = conv.conversion(value)
     // Format with max decimal places of 2. Remove if its .00
     let fixed = converted.toFixed(2).replace(/\.00$/, '')
-    let newText =  fixed + conv.target
+    // No delimter for ° F conversions
+    if (unit.startsWith("°")) {
+      delimiter = ""
+    } else if (delimiter == "") {
+      delimiter = " "
+    }
+    let newText =  fixed + delimiter + (fixed == 1 ? conv.target : conv.plural)
     return callback(newText, oldText)
   })
 }
