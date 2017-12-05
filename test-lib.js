@@ -46,6 +46,10 @@ let tests = {
   "10 imperial ton": "10.16 metric tons",
   // Plural
   "1.102 short tons": "1 metric ton",
+  // Delimiter
+  "1\tlb": "0.45\tkg",
+  "1\nlb": "0.45\nkg",
+  "1  lb": null, // only singular whitespace is currently supported
 }
 
 function runTests(silent) {
