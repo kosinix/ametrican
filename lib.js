@@ -1,77 +1,59 @@
-var conversions = [
-  // Length
-  {
-    regex: /inch(es)?|in\.?/,
-    target: " cm",
-    conversion: x => x * 2.54
-  },
-  {
-    regex: /foot|feet|ft\.?/,
-    target: " m",
-    conversion: x => x * 0.3048
-  },
-  {
-    regex: /yards?|yd\.?/,
-    target: " m",
-    conversion: x => x * 0.9144
-  },
-  {
-    regex: /miles?|mi\.?/,
-    target: " km",
-    conversion: x => x * 1.609344
-  },
-  // speed
-  {
-    regex: /mph/,
-    target: " kph",
-    conversion: x => x * 1.609344
-  },
-  // Mass
-  {
-    regex: /ounces?|oz/,
-    target: " g",
-    conversion: x => x * 28.35
-  },
-  {
-    regex: /pounds?|lb[s\.]?/,
-    target: " kg",
-    conversion: x => x * 0.4536
-  },
-  {
-    regex: /short tons?|[uU][sS] tons?/,
-    target: " metric ton",
-    conversion: x => x * 0.907185
-  },
-  {
-    regex: /long tons?|imperial tons?/,
-    target: " metric ton",
-    conversion: x => x * 1.01605
-  },
-  // Temperature
-  // Fahrenheit needs to be earlier in the list than F so that arr.find()
-  // first tries to match the full Fahrenheit
-  {
-    regex: /°\s?Fahrenheit/,
-    target: "° Celsius",
-    conversion: x => (x - 32) * 5 / 9
-  },
-  {
-    regex: /°\s?F/,
-    target: "° C",
-    conversion: x => (x - 32) * 5 / 9
+if (!conversions) {
+  var conversions = []
+  // Arguments: regex, target, [plural,] function
+  let addConv = function(regex, target, arg3, arg4) {
+    conversions.push({
+      regex: regex,
+      target: target,
+      plural: arg4 ? arg3 : target,
+      conversion: arg4 ? arg4 : arg3,
+    })
   }
-]
+  // Length
+  let in_to_cm = x => x * 2.54
+  addConv(/in\.?/, "cm", in_to_cm)
+  addConv(/inch(es)?/, "centimeter", "centimeters", in_to_cm)
+  let ft_to_m = x => x * 0.3048
+  addConv(/foot|(feet)/, "meter", "meters", ft_to_m)
+  addConv(/ft\.?/, "m", ft_to_m)
+  let yd_to_m = x => x * 0.9144
+  addConv(/yard(s)?/, "meter", "meters", yd_to_m)
+  addConv(/yd\.?/, "m", yd_to_m)
+  let mile_to_m = x => x * 1.609344
+  addConv(/mi\.?/, "km", mile_to_m)
+  addConv(/miles?/, "kilometer", "kilometers", mile_to_m)
+  // Speed
+  addConv(/mph/, "km/h", mile_to_m)
+  // Mass
+  let oz_to_g = x => x * 28.35
+  addConv(/oz/, "g", oz_to_g)
+  addConv(/ounces?/, "gram", "grams", oz_to_g)
+  let lb_to_kg = x => x * 0.4536
+  addConv(/lb[s\.]?/, "kg", lb_to_kg)
+  addConv(/pounds?/, "kilogram", "kilograms", lb_to_kg)
+  addConv(/short tons?|us tons?/, "metric ton", "metric tons", x => x * 0.907185)
+  addConv(/long tons?|imperial tons?/, "metric ton", "metric tons", x => x * 1.01605)
+  // Temperature
+  let f_to_c = x => (x - 32) * 5 / 9
+  addConv(/°\s?F/, "° C", f_to_c)
+  addConv(/°\s?Fahrenheit/, "° Celsius", f_to_c)
 
-// Should match any number (does it?)
-// Negatives are relative for Fahrenheit conversion
-// These are different characters: - (char code 45) and − (char code 8722)
-var re_number = /[−\-]?\d+(\.\d+)?/
+  // Should match any number (does it?)
+  // Negatives are relative for Fahrenheit conversion
+  // These are different characters: - (char code 45) and − (char code 8722)
+  let re_number = /[−\-]?\d+(\.\d+)?/
 
-// "One RegExp to rule them all, One RegExp to find them ..."
-var re_all = new RegExp("(" + re_number.source + ")\\s?("
-                            + conversions.map(x => x.regex.source).join("|")
-                            + ")\\b",
-                          "gi")
+  // "One RegExp to rule them all, One RegExp to find them ..."
+  var re_all = new RegExp("(" + re_number.source + ")(\\s?)("
+                              + conversions.map(x => x.regex.source).join("|")
+                              + ")\\b", "gi")
+
+  // Ensure the regular expression match the complete unit and are case insensitive
+  conversions = conversions.map(c => {
+    c.regex = new RegExp(c.regex.source + "$", "i")
+    return c
+  })
+}
 
 /**
 * Replaces all occurences of imperial units in a string with appropriate metric
@@ -79,14 +61,20 @@ var re_all = new RegExp("(" + re_number.source + ")\\s?("
 */
 function convertToMetric(text, callback) {
   callback = callback || (x => x)
-  return text.replace(re_all, (oldText, value, _, unit) => {
+  return text.replace(re_all, (oldText, value, _, delimiter, unit) => {
     let conv = conversions.find(c => unit.match(c.regex))
     // some people might use char code 8722 instead of 45...
     value = value.replace("−", "-")
     let converted = conv.conversion(value)
     // Format with max decimal places of 2. Remove if its .00
     let fixed = converted.toFixed(2).replace(/\.00$/, '')
-    let newText =  fixed + conv.target
+    // No delimter for ° F conversions
+    if (unit.startsWith("°")) {
+      delimiter = ""
+    } else if (delimiter == "") {
+      delimiter = " "
+    }
+    let newText =  fixed + delimiter + (fixed == 1 ? conv.target : conv.plural)
     return callback(newText, oldText)
   })
 }
