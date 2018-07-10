@@ -11,11 +11,11 @@ if (!conversions) {
   }
   // Length
   let in_to_cm = x => x * 2.54
-  addConv(/in\./, "cm", in_to_cm)
+  addConv(/in\.|"|”|''|’’/, "cm", in_to_cm)
   addConv(/inch(es)?/, "centimeter", "centimeters", in_to_cm)
   let ft_to_m = x => x * 0.3048
   addConv(/foot|(feet)/, "meter", "meters", ft_to_m)
-  addConv(/ft/, "m", ft_to_m)
+  addConv(/ft|'|’/, "m", ft_to_m)
   let yd_to_m = x => x * 0.9144
   addConv(/yard(s)?/, "meter", "meters", yd_to_m)
   addConv(/yd/, "m", yd_to_m)
@@ -43,9 +43,9 @@ if (!conversions) {
   // These are different characters: - (char code 45) and − (char code 8722)
   let re_number = /[−\-]?\d+(\.\d+)?/
 
-  // Add word boundary anchor to each conversion, which does not end in a dot
+  // Add word boundary anchor to each conversion, which does not end in a dot or quotation mark
   conversions.forEach(c => {
-    c.regex = new RegExp(c.regex.source.split("|").map(x => x.endsWith("\\.") ? x : x + "\\b").join("|"))
+    c.regex = new RegExp(c.regex.source.split("|").map(x => x.match(/[.’”'"]$/) ? x : x + "\\b").join("|"))
   })
 
   // "One RegExp to rule them all, One RegExp to find them ..."
