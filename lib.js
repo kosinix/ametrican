@@ -11,16 +11,16 @@ if (!conversions) {
   }
   // Length
   let in_to_cm = x => x * 2.54
-  addConv(/in\.?/, "cm", in_to_cm)
+  addConv(/in\./, "cm", in_to_cm)
   addConv(/inch(es)?/, "centimeter", "centimeters", in_to_cm)
   let ft_to_m = x => x * 0.3048
   addConv(/foot|(feet)/, "meter", "meters", ft_to_m)
-  addConv(/ft\.?/, "m", ft_to_m)
+  addConv(/ft/, "m", ft_to_m)
   let yd_to_m = x => x * 0.9144
   addConv(/yard(s)?/, "meter", "meters", yd_to_m)
-  addConv(/yd\.?/, "m", yd_to_m)
+  addConv(/yd/, "m", yd_to_m)
   let mile_to_m = x => x * 1.609344
-  addConv(/mi\.?/, "km", mile_to_m)
+  addConv(/mi/, "km", mile_to_m)
   addConv(/miles?/, "kilometer", "kilometers", mile_to_m)
   // Speed
   addConv(/mph/, "km/h", mile_to_m)
@@ -29,7 +29,7 @@ if (!conversions) {
   addConv(/oz/, "g", oz_to_g)
   addConv(/ounces?/, "gram", "grams", oz_to_g)
   let lb_to_kg = x => x * 0.4536
-  addConv(/lb[s\.]?/, "kg", lb_to_kg)
+  addConv(/lbs?/, "kg", lb_to_kg)
   addConv(/pounds?/, "kilogram", "kilograms", lb_to_kg)
   addConv(/short tons?|us tons?/, "metric ton", "metric tons", x => x * 0.907185)
   addConv(/long tons?|imperial tons?/, "metric ton", "metric tons", x => x * 1.01605)
@@ -43,15 +43,19 @@ if (!conversions) {
   // These are different characters: - (char code 45) and − (char code 8722)
   let re_number = /[−\-]?\d+(\.\d+)?/
 
+  // Add word boundary anchor to each conversion, which does not end in a dot
+  conversions.forEach(c => {
+    c.regex = new RegExp(c.regex.source.split("|").map(x => x.endsWith("\\.") ? x : x + "\\b").join("|"))
+  })
+
   // "One RegExp to rule them all, One RegExp to find them ..."
   var re_all = new RegExp("(" + re_number.source + ")(\\s?)("
                               + conversions.map(x => x.regex.source).join("|")
-                              + ")\\b", "gi")
+                              + ")", "gi")
 
   // Ensure the regular expression match the complete unit and are case insensitive
-  conversions = conversions.map(c => {
+  conversions.forEach(c => {
     c.regex = new RegExp(c.regex.source + "$", "i")
-    return c
   })
 }
 

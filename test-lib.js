@@ -25,9 +25,10 @@ let tests = {
   "No space between num and unit: 2.2lbs.": "No space between num and unit: 1 kg.",
   // inch -> centimeter
   "1 inch": "2.54 centimeters",
-  "2 in. is short": "5.08 cm. is short",
+  "2 in. is short": "5.08 cm is short",
   "12 inches": "30.48 centimeters",
   "2 inchworms are crawling.": null,
+  "…gaseous CO2 in equilibrium.": null,
   // Fahrenheit -> Celsius
   "Water boils at 212° Fahrenheit.": "Water boils at 100° Celsius.",
   "Body temp: 98.6° F": "Body temp: 37° C",
