@@ -3,7 +3,8 @@ if (!conversions) {
   // Arguments: regex, target, [plural,] function
   let addConv = function(regex, target, arg3, arg4) {
     conversions.push({
-      regex: regex,
+      // Add word boundary anchor to each conversion, which does not end in a dot or quotation mark
+      regex: new RegExp(regex.source.split("|").map(x => x.match(/[.’”'"]$/) ? x : x + "\\b").join("|"), "i"),
       target: target,
       plural: arg4 ? arg3 : target,
       conversion: arg4 ? arg4 : arg3,
@@ -12,12 +13,12 @@ if (!conversions) {
   // Length
   let in_to_cm = x => x * 2.54
   addConv(/in\.|"|”|''|’’/, "cm", in_to_cm)
-  addConv(/inch(es)?/, "centimeter", "centimeters", in_to_cm)
+  addConv(/inch|inches/, "centimeter", "centimeters", in_to_cm)
   let ft_to_m = x => x * 0.3048
-  addConv(/foot|(feet)/, "meter", "meters", ft_to_m)
+  addConv(/foot|feet/, "meter", "meters", ft_to_m)
   addConv(/ft|'|’/, "m", ft_to_m)
   let yd_to_m = x => x * 0.9144
-  addConv(/yard(s)?/, "meter", "meters", yd_to_m)
+  addConv(/yards?/, "meter", "meters", yd_to_m)
   addConv(/yd/, "m", yd_to_m)
   let mile_to_m = x => x * 1.609344
   addConv(/mi/, "km", mile_to_m)
@@ -43,43 +44,74 @@ if (!conversions) {
   // These are different characters: - (char code 45) and − (char code 8722)
   let re_number = /[−\-]?\d+(\.\d+)?/
 
-  // Add word boundary anchor to each conversion, which does not end in a dot or quotation mark
-  conversions.forEach(c => {
-    c.regex = new RegExp(c.regex.source.split("|").map(x => x.match(/[.’”'"]$/) ? x : x + "\\b").join("|"))
+  var conversionStrategies = [
+    // normal: <number><delimiter><unit>
+    // example: 1 foot
+    {
+      regex: new RegExp("(" + re_number.source + ")(\\s?)("
+                            + conversions.map(x => x.regex.source).join("|")
+                            + ")", "gi"),
+      fn: (whole, value, _, delimiter, unit) => {
+        let conv = conversions.find(c => unit.match(c.regex))
+        // some people might use char code 8722 instead of 45...
+        value = value.replace("−", "-")
+        let converted = conv.conversion(value)
+        // Format with max decimal places of 2. Remove if its .00
+        let fixed = converted.toFixed(2).replace(/\.00$/, '')
+        // No delimter for ° F conversions
+        if (unit.startsWith("°")) {
+          delimiter = ""
+        } else if (delimiter == "") {
+          delimiter = " "
+        }
+        let newText =  fixed + delimiter + (fixed == 1 ? conv.target : conv.plural)
+        return newText
+      }
+    }
+    // inverted: <number><metric-delimiter><unit>
+    // example: 50 kWh/mile
+
+    // special:
+    // example: 5'2"
+  ]
+
+  // Count groups
+  conversionStrategies.forEach(s => {
+    s.group_count = s.regex.source.split("(").length - 1
   })
 
   // "One RegExp to rule them all, One RegExp to find them ..."
-  var re_all = new RegExp("(" + re_number.source + ")(\\s?)("
-                              + conversions.map(x => x.regex.source).join("|")
-                              + ")", "gi")
+  // Merge all strategies regular expressions
+  var re_all = new RegExp(conversionStrategies.map(s => "(" + s.regex.source + ")").join("|"), "gi")
 
   // Ensure the regular expression match the complete unit and are case insensitive
-  conversions.forEach(c => {
-    c.regex = new RegExp(c.regex.source + "$", "i")
-  })
+  //conversions.forEach(c => {
+  //  c.regex = new RegExp(c.regex.source + "$", "i")
+  //})
 }
 
 /**
-* Replaces all occurences of imperial units in a string with appropriate metric
+* Replaces all occurences of imperial units  in a string with appropriate metric
 * units. Optional callback is applied to each replaced sub-string.
 */
 function convertToMetric(text, callback) {
   callback = callback || (x => x)
-  return text.replace(re_all, (oldText, value, _, delimiter, unit) => {
-    let conv = conversions.find(c => unit.match(c.regex))
-    // some people might use char code 8722 instead of 45...
-    value = value.replace("−", "-")
-    let converted = conv.conversion(value)
-    // Format with max decimal places of 2. Remove if its .00
-    let fixed = converted.toFixed(2).replace(/\.00$/, '')
-    // No delimter for ° F conversions
-    if (unit.startsWith("°")) {
-      delimiter = ""
-    } else if (delimiter == "") {
-      delimiter = " "
+  return text.replace(re_all, function(oldText) {
+    // Find first matching group index
+    for (i = 1; i < arguments.length; i++) {
+      if (arguments[i]) break;
     }
-    let newText =  fixed + delimiter + (fixed == 1 ? conv.target : conv.plural)
-    return callback(newText, oldText)
+    // Apply the right strategy
+    for (let strategy of conversionStrategies) {
+      if (i < strategy.group_count) {
+        return callback(strategy.fn.apply(this, Array.from(arguments).slice(i)), oldText)
+      } else {
+        i -= strategy.group_count
+      }
+    }
+    // Should never happen
+    console.log("Warning! Unexpected match: " + oldText)
+    return oldText
   })
 }
 
