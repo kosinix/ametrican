@@ -44,35 +44,55 @@ if (!conversions) {
   // These are different characters: - (char code 45) and − (char code 8722)
   let re_number = /[−\-]?\d+(\.\d+)?/
 
+  // Format with max decimal places of 2. Remove if its .00
+  let fix = x => x.toFixed(2).replace(/\.00$/, '')
+
   var conversionStrategies = [
+    // special case: feet'inch'' abbreviation
+    // example: 5'2"
+    {
+      regex: new RegExp("(" + re_number.source + ")\\s?['’]\\s?(" + re_number.source + ")\\s?([\"”]|''|’’)"),
+      fn: (_whole, val_ft, _, val_in) => {
+        val_ft = val_ft.replace("−", "-")
+        val_in = val_in.replace("−", "-")
+        let value = ft_to_m(val_ft) + (in_to_cm(val_in) / 100.0)
+        return fix(value) + "m"
+      }
+    },
     // normal: <number><delimiter><unit>
     // example: 1 foot
     {
       regex: new RegExp("(" + re_number.source + ")(\\s?)("
                             + conversions.map(x => x.regex.source).join("|")
-                            + ")", "gi"),
-      fn: (whole, value, _, delimiter, unit) => {
+                            + ")",),
+      fn: (_whole, value, _, delimiter, unit) => {
         let conv = conversions.find(c => unit.match(c.regex))
         // some people might use char code 8722 instead of 45...
         value = value.replace("−", "-")
-        let converted = conv.conversion(value)
-        // Format with max decimal places of 2. Remove if its .00
-        let fixed = converted.toFixed(2).replace(/\.00$/, '')
+        let converted = fix(conv.conversion(value))
         // No delimter for ° F conversions
         if (unit.startsWith("°")) {
           delimiter = ""
         } else if (delimiter == "") {
           delimiter = " "
         }
-        let newText =  fixed + delimiter + (fixed == 1 ? conv.target : conv.plural)
-        return newText
+        return converted + delimiter + (converted == 1 ? conv.target : conv.plural)
       }
-    }
+    },
     // inverted: <number><metric-delimiter><unit>
     // example: 50 kWh/mile
-
-    // special:
-    // example: 5'2"
+    {
+      regex: new RegExp("(" + re_number.source + ")(\\s?\\w+\\s?/\\s?)("
+                            + conversions.map(x => x.regex.source).join("|")
+                            + ")"),
+      fn: (_whole, value, _, delimiter, unit) => {
+        let conv = conversions.find(c => unit.match(c.regex))
+        // some people might use char code 8722 instead of 45...
+        value = value.replace("−", "-")
+        let converted = fix(value / conv.conversion(1))
+        return converted + delimiter + conv.target
+      }
+    },
   ]
 
   // Count groups
@@ -83,15 +103,10 @@ if (!conversions) {
   // "One RegExp to rule them all, One RegExp to find them ..."
   // Merge all strategies regular expressions
   var re_all = new RegExp(conversionStrategies.map(s => "(" + s.regex.source + ")").join("|"), "gi")
-
-  // Ensure the regular expression match the complete unit and are case insensitive
-  //conversions.forEach(c => {
-  //  c.regex = new RegExp(c.regex.source + "$", "i")
-  //})
 }
 
 /**
-* Replaces all occurences of imperial units  in a string with appropriate metric
+* Replaces all occurences of imperial units in a string with appropriate metric
 * units. Optional callback is applied to each replaced sub-string.
 */
 function convertToMetric(text, callback) {
@@ -102,11 +117,12 @@ function convertToMetric(text, callback) {
       if (arguments[i]) break;
     }
     // Apply the right strategy
+    let j = i
     for (let strategy of conversionStrategies) {
-      if (i < strategy.group_count) {
+      if (j < strategy.group_count) {
         return callback(strategy.fn.apply(this, Array.from(arguments).slice(i)), oldText)
       } else {
-        i -= strategy.group_count
+        j -= strategy.group_count + 1
       }
     }
     // Should never happen

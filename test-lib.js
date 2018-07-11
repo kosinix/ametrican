@@ -39,7 +39,7 @@ let tests = {
   "1 foot": "0.30 meters",
   "4'": "1.22 m",
   "4’": "1.22 m",
-  "4’2’’": "1.22 m5.08 cm", // TODO This doesn't look nice at all
+  "4’2’’": "1.27m",
   // Fahrenheit -> Celsius
   "Water boils at 212° Fahrenheit.": "Water boils at 100° Celsius.",
   "Body temp: 98.6° F": "Body temp: 37° C",
@@ -62,6 +62,8 @@ let tests = {
   "1\tlb": "0.45\tkg",
   "1\nlb": "0.45\nkg",
   "1  lb": null, // only singular whitespace is currently supported
+  // Inverted units
+  "My energy consumption is 5 kWh/mile": "My energy consumption is 3.11 kWh/kilometer",
 }
 
 function runTests(silent) {
