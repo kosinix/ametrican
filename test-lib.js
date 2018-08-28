@@ -25,9 +25,21 @@ let tests = {
   "No space between num and unit: 2.2lbs.": "No space between num and unit: 1 kg.",
   // inch -> centimeter
   "1 inch": "2.54 centimeters",
-  "2 in. is short": "5.08 cm. is short",
+  "2 in. is short": "5.08 cm is short",
   "12 inches": "30.48 centimeters",
+  "2\"": "5.08 cm",
+  "2''": "5.08 cm",
+  "2”": "5.08 cm",
+  "2’’": "5.08 cm",
   "2 inchworms are crawling.": null,
+  "…gaseous CO2 in equilibrium.": null,
+  // foot -> meter
+  "2 ft": "0.61 m",
+  "2 feet": "0.61 meters",
+  "1 foot": "0.30 meters",
+  "4'": "1.22 m",
+  "4’": "1.22 m",
+  "4’2’’": "1.27m",
   // Fahrenheit -> Celsius
   "Water boils at 212° Fahrenheit.": "Water boils at 100° Celsius.",
   "Body temp: 98.6° F": "Body temp: 37° C",
@@ -50,6 +62,8 @@ let tests = {
   "1\tlb": "0.45\tkg",
   "1\nlb": "0.45\nkg",
   "1  lb": null, // only singular whitespace is currently supported
+  // Inverted units
+  "My energy consumption is 5 kWh/mile": "My energy consumption is 3.11 kWh/kilometer",
 }
 
 function runTests(silent) {
